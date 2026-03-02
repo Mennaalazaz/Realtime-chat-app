@@ -33,7 +33,11 @@ The application demonstrates:
 
 - JavaScript
 
-- SQLite
+## Installation & Setup
+### 1. Clone Repository
+``` git clone https://github.com/yourusername/Chat-App.git
+cd Chat-App  
+- SQLite 
 
 <img width="937" height="657" alt="image" src="https://github.com/user-attachments/assets/7ef931a2-fad2-457a-870b-0ed7d02fe38b" />
 
