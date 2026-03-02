@@ -1,0 +1,87 @@
+{% load static %}
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Chat Room</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <link rel="stylesheet" href="{% static 'room.css' %}">
+</head>
+<body>
+
+<div class="header">
+    <div>Room: {{room_name}}</div>
+    <div>{{username}}</div>
+</div>
+
+<div class="chat-container" id="chat-container">
+</div>
+
+<div class="input-area">
+    <input type="text" id="message-input" placeholder="Type your message...">
+    <button onclick="sendMessage()">Send</button>
+</div>
+
+<!-- JavaScript for handling real-time updates using AJAX -->
+<script>
+
+let roomName = "{{room_name}}"
+let username = "{{username}}"
+
+function fetchMessages() {
+    fetch('/getMessages/' + roomName + '/')
+    .then(response => response.json())
+    .then(data => {
+
+        let chatContainer = document.getElementById("chat-container")
+        chatContainer.innerHTML = ""
+
+        data.messages.forEach(msg => {
+            let messageDiv = document.createElement("div")
+
+            if (msg.username === username) {
+                messageDiv.className = "message sent"
+            } else {
+                messageDiv.className = "message received"
+            }
+
+        messageDiv.innerHTML = `
+            <span class="username">${msg.username}</span>
+            <div class="message-body">${msg.content}</div>
+            <span class="timestamp">${msg.timestamp}</span> 
+            `
+            chatContainer.appendChild(messageDiv)
+        })
+
+        chatContainer.scrollTop = chatContainer.scrollHeight
+    })
+}
+
+function sendMessage() {
+
+    let message = document.getElementById("message-input").value
+
+    fetch('/sendMessage/', {
+        method: 'POST',
+        headers: {
+            'Content-Type': 'application/x-www-form-urlencoded',
+            'X-CSRFToken': '{{ csrf_token }}'
+        },
+        body: `message=${message}&username=${username}&room_name=${roomName}`
+    })
+    .then(response => response.json())
+    .then(data => {
+        document.getElementById("message-input").value = ""
+        fetchMessages()
+    })
+}
+
+// Auto refresh every 1 second
+setInterval(fetchMessages, 1000)
+
+fetchMessages()
+
+</script>
+
+</body>
+</html>
